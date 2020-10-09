@@ -27,7 +27,7 @@ function run() {
     addData();
 };
 
-//TYPE OF EMPLOYEE TO CREATE PROMPT
+//SESSION GOAL PROMPT
 
 function addData() {
     inquirer
@@ -59,13 +59,13 @@ function addData() {
         })
 };
 
-//ADD ANOTHER EMPLOYEE PROMPT
-function nextEmployee() {
+//DO SOMETHING ELSE PROMPT
+function repeatPrompts() {
     inquirer
         .prompt([{
             type: 'list',
             name: 'next',
-            message: 'Add another employee?',
+            message: 'Do something else?',
             choices: [
                 { name: 'YES' },
                 { name: 'NO' },
@@ -93,30 +93,14 @@ function nextEmployee() {
 function createDepartment() {
     inquirer
         .prompt([{
-                type: 'input',
-                name: 'name',
-                message: 'EMPLOYEE NAME'
-            },
-            {
-                type: 'input',
-                name: 'id',
-                message: 'EMPLOYEE ID'
-            },
-            {
-                type: 'input',
-                name: 'email',
-                message: 'EMPLOYEE EMAIL'
-            },
-            {
-                type: 'input',
-                name: 'username',
-                message: 'GITHUB USERNAME'
-            }
-        ])
+            type: 'input',
+            name: 'name',
+            message: 'DEPARTMENT NAME'
+        }])
         .then(answers => {
-            const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.username);
-            employees.push(newEngineer);
-            nextEmployee();
+            //const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.username);
+            //employees.push(newEngineer);
+            //repeatPrompts();
         });
 };
 
@@ -124,29 +108,19 @@ function createEmployee() {
     inquirer
         .prompt([{
                 type: 'input',
-                name: 'name',
-                message: 'EMPLOYEE NAME'
+                name: 'first_name',
+                message: 'EMPLOYEE FIRST NAME'
             },
             {
                 type: 'input',
-                name: 'id',
-                message: 'EMPLOYEE ID'
-            },
-            {
-                type: 'input',
-                name: 'email',
-                message: 'EMPLOYEE EMAIL'
-            },
-            {
-                type: 'input',
-                name: 'school',
-                message: 'SCHOOL NAME'
+                name: 'last_name',
+                message: 'EMPLOYEE LAST NAME'
             }
         ])
         .then(answers => {
-            const newIntern = new Intern(answers.name, answers.id, answers.email, answers.school);
-            employees.push(newIntern);
-            nextEmployee();
+            //const newIntern = new Intern(answers.name, answers.id, answers.email, answers.school);
+            //employees.push(newIntern);
+            //repeatPrompts();
         });
 
 };
@@ -155,29 +129,19 @@ function createRole() {
     inquirer
         .prompt([{
                 type: 'input',
-                name: 'name',
-                message: 'EMPLOYEE NAME'
+                name: 'title',
+                message: 'ROLE TITLE'
             },
             {
                 type: 'input',
-                name: 'id',
-                message: 'EMPLOYEE ID'
-            },
-            {
-                type: 'input',
-                name: 'email',
-                message: 'EMPLOYEE EMAIL'
-            },
-            {
-                type: 'input',
-                name: 'officeNumber',
-                message: 'OFFICE NUMBER'
+                name: 'salary',
+                message: 'ROLE SALARY'
             }
         ])
         .then(answers => {
-            const newManager = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
-            employees.push(newManager);
-            nextEmployee();
+            //const newManager = new Manager(answers.name, answers.id, answers.email, answers.officeNumber);
+            //employees.push(newManager);
+            //repeatPrompts();
         });
 };
 
