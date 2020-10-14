@@ -128,21 +128,15 @@ function repeatPrompts() {
             ]
         }])
         .then(answers => {
-            if (answers.next == 'YES') {
+            if (answers.next === 'YES') {
                 addData();
-            }
-            if (answers.next == 'NO') {
+            } else {
                 console.log("Goodbye");
+                connection.end();
             }
-
-        })
-        .then(function() {
-            connection.end();
-        })
-        .catch(function(error) {
-            console.log(error);
         });
 }
+
 
 //CREATE SPECIFIC EMPLOYEE TYPE
 
@@ -164,7 +158,7 @@ function createDepartment() {
                 },
                 function(err, res) {
                     if (err) throw err;
-                    console.log(res.affectedRows + " department inserted!")
+                    console.log("Department Inserted!")
                     repeatPrompts();
                 }
             )
@@ -197,7 +191,7 @@ function createEmployee() {
                     if (err) {
                         console.log(err);
                     } //throw err;
-                    console.log(res.affectedRows + " employee inserted!")
+                    console.log("Employee Inserted!")
                     repeatPrompts();
                 }
             )
@@ -233,7 +227,7 @@ function createRole() {
                 },
                 function(err, res) {
                     if (err) throw err;
-                    console.log(res.affectedRows + " role inserted!")
+                    console.log("Role Inserted!")
                     repeatPrompts();
                 }
             )
@@ -256,5 +250,3 @@ connection.connect(function(err) {
     console.log("connected as id " + connection.threadId);
     run();
 });
-//
-//run();
