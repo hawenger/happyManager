@@ -1,48 +1,207 @@
-//const Manager = require("./lib/Manager");
-//const Engineer = require("./lib/Engineer");
-//const Intern = require("./lib/Intern");
 const mysql = require("mysql");
+const inquirer = require("inquirer");
 
 const connection = mysql.createConnection({
     host: "localhost",
-
-    // Your port; if not 3306
     port: 3306,
-
-    // Your username
     user: "root",
-
-    // Your password
     password: "password",
     database: "happyManagerDB"
 });
 
-
-const inquirer = require("inquirer");
-const path = require("path");
-const fs = require("fs");
-const util = require("util");
-const { ENETUNREACH } = require("constants");
-
-
-//const OUTPUT_DIR = path.resolve(__dirname, "output");
-//const outputPath = path.join(OUTPUT_DIR, "team.html");
-
-//const render = require("./lib/htmlRenderer");
-//const writeFileAsync = util.promisify(fs.writeFile);
-
-//const employees = [];
-
-//GENERATE TEAM.html
-
-//function generateMyTeam() {
-//const teamHTML = render(employees);
-//writeFileAsync(outputPath, teamHTML);
-//}
 //FUNCTION TO BEGIN APPLICATION
 
 function run() {
     addData();
+};
+
+//INITIAL PROMPT
+
+function addData() {
+    inquirer
+        .prompt([{
+            type: 'list',
+            name: 'type',
+            message: 'What would you like to do?',
+            choices: [
+                { name: 'ADD NEW' },
+                { name: 'UPDATE' },
+                { name: 'SEARCH' },
+                { name: 'TERMINATE EMPLOYEE' },
+                { name: 'x EXIT' }
+            ]
+        }]).then(answers => {
+            if (answers.type == 'ADD NEW') {
+                addNew();
+            }
+            if (answers.type == 'UPDATE') {
+                update();
+            }
+            if (answers.type == 'SEARCH') {
+                search();
+            }
+            if (answers.type == 'TERMINATE EMPLOYEE') {
+                terminate();
+            }
+            if (answers.type == 'x EXIT') {
+                exit();
+            }
+        })
+};
+
+//ADD, UPDATE, SEARCH, TERMINATE PROMPTS
+
+function addNew() {
+    inquirer
+        .prompt([{
+            type: 'list',
+            name: 'type',
+            message: 'Add new',
+            choices: [
+                { name: 'Employee' },
+                { name: 'Department' },
+                { name: 'Role' },
+                { name: '<==' }
+            ]
+        }]).then(answers => {
+            if (answers.type == 'Employee') {
+                createEmployee();
+            }
+            if (answers.type == 'Department') {
+                createDepartment();
+            }
+            if (answers.type == 'Role') {
+                createRole();
+            }
+            if (answers.type == '<==') {
+                addData();
+            }
+        })
+};
+
+function update() {
+    inquirer
+        .prompt([{
+            type: 'list',
+            name: 'type',
+            message: 'Update',
+            choices: [
+                { name: 'Employee' },
+                { name: 'Department' },
+                { name: 'Role' },
+                { name: '<==' }
+            ]
+        }]).then(answers => {
+            if (answers.type == 'Employee') {
+                updateEmployee();
+            }
+            if (answers.type == 'Department') {
+                updateDepartment();
+            }
+            if (answers.type == 'Role') {
+                updateRole();
+            }
+            if (answers.type == '<==') {
+                addData();
+            }
+        })
+};
+
+function search() {
+    inquirer
+        .prompt([{
+            type: 'list',
+            name: 'type',
+            message: 'Search',
+            choices: [
+                { name: 'Employee' },
+                { name: 'Department' },
+                { name: 'Role' },
+                { name: '<==' }
+            ]
+        }]).then(answers => {
+            if (answers.type == 'Employee') {
+                searchEmployee();
+            }
+            if (answers.type == 'Department') {
+                searchDepartment();
+            }
+            if (answers.type == 'Role') {
+                searchRole();
+            }
+            if (answers.type == '<==') {
+                addData();
+            }
+        })
+};
+//
+//function terminate() {
+//    inquirer
+//        .prompt([{
+//            type: 'list',
+//            name: 'type',
+//            message: 'Add new',
+//            choices: [
+//                { name: 'Employee' },
+//                { name: 'Department' },
+//                { name: 'Role' },
+//                { name: '<==' }
+//            ]
+//        }]).then(answers => {
+//            if (answers.type == 'Employee') {
+//                terminateEmployee();
+//            }
+//        })
+//};
+
+//DO SOMETHING ELSE PROMPT
+function repeatPrompts() {
+    inquirer
+        .prompt([{
+            type: 'list',
+            name: 'next',
+            message: 'Do something else?',
+            choices: [
+                { name: 'YES' },
+                { name: 'NO' },
+            ]
+        }])
+        .then(answers => {
+            if (answers.next === 'YES') {
+                addData();
+            } else {
+                exit();
+            }
+        });
+}
+
+//EXIT PROGRAM
+
+function exit() {
+    console.log("Goodbye");
+    connection.end();
+}
+
+//SEARCH TYPE
+
+
+function searchRole() {
+    //inquirer
+    //    .prompt([{
+    //        type: 'confirm',
+    //        name: 'search_role',
+    //        message: 'Search for role?'
+    //    }])
+    //    .then(answers => {
+    //if (answers.search_emp == "Yes") {
+    connection.query("SELECT * FROM employee_role",
+            function(err, res) {
+                if (err) throw err;
+                console.log(res);
+                repeatPrompts();
+            }
+        )
+        //});
 };
 
 //SEARCH FUNCTIONS
@@ -84,26 +243,65 @@ function searchDepartment() {
         //   });
 };
 
-function searchRole() {
-    //inquirer
-    //    .prompt([{
-    //        type: 'confirm',
-    //        name: 'search_role',
-    //        message: 'Search for role?'
-    //    }])
-    //    .then(answers => {
-    //if (answers.search_emp == "Yes") {
-    connection.query("SELECT * FROM employee_role",
-            function(err, res) {
-                if (err) throw err;
-                console.log(res);
-                repeatPrompts();
-            }
-        )
-        //});
-};
+//UPDATE TYPE
 
-function updateEmployee() {};
+function updateEmployee() {
+    connection.query("SELECT * FROM employee",
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            console.log("PRESS Y TO CONTINUE")
+        }
+    )
+    inquirer
+        .prompt([{
+                type: 'confirm',
+                name: 'confirm_process',
+                message: 'I NEED SOME INFORAMTION FROM YOU'
+            },
+            {
+                type: 'input',
+                name: 'emp_id',
+                message: 'EMPLOYEE ID OF EMPLOYEE TO UPDATE'
+            },
+            {
+                type: 'input',
+                name: 'first_name',
+                message: 'ENTER EMPLOYEE FIRST NAME'
+            },
+            {
+                type: 'input',
+                name: 'last_name',
+                message: 'ENTER EMPLOYEE LAST NAME'
+            },
+            {
+                type: 'input',
+                name: 'role',
+                message: 'ENTER EMPLOYEE ROLE'
+            }
+        ])
+        .then(answers => {
+            //const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.username);
+            //employees.push(newEngineer);
+            //repeatPrompts();
+            connection.query(
+                "UPDATE employee SET ? WHERE ?", [{
+                        first_name: answers.first_name,
+                        last_name: answers.last_name //,
+                            //department: answers.department
+                    },
+                    {
+                        id: answers.emp_id
+                    }
+                ],
+                function(err, res) {
+                    if (err) throw err;
+                    console.log(`Employee ${answers.emp_id}, ${answers.first_name} ${answers.last_name} has been updated. Good job.`)
+                    repeatPrompts();
+                }
+            )
+        });
+};
 
 function updateRole() {
     connection.query("SELECT * FROM employee_role",
@@ -156,89 +354,60 @@ function updateRole() {
                 ],
                 function(err, res) {
                     if (err) throw err;
-                    console.log("Department Inserted!")
+                    console.log(`Role ${answers.role_id} has been updated. Good job.`)
                     repeatPrompts();
                 }
             )
         });
 };
 
-function updateDepartment() {};
-//SESSION GOAL PROMPT
-
-function addData() {
+function updateDepartment() {
+    connection.query("SELECT * FROM department",
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            console.log("PRESS Y TO CONTINUE")
+        }
+    )
     inquirer
         .prompt([{
-            type: 'list',
-            name: 'type',
-            message: 'What would you like to do?',
-            choices: [
-                { name: 'Add Employee' },
-                { name: 'Add Department' },
-                { name: 'Add Role' },
-                { name: 'Search Employee' },
-                { name: 'Search Department' },
-                { name: 'Search Role' },
-                { name: 'Update Employee' },
-                { name: 'Update Department' },
-                { name: 'Update Role' }
-            ]
-        }]).then(answers => {
-            if (answers.type == 'Add Employee') {
-                createEmployee();
+                type: 'confirm',
+                name: 'confirm_process',
+                message: 'I NEED SOME INFORAMTION FROM YOU'
+            },
+            {
+                type: 'input',
+                name: 'department_id',
+                message: 'DEPARTMENT ID OF DEPARTMENT TO UPDATE'
+            },
+            {
+                type: 'input',
+                name: 'title',
+                message: 'ENTER DEPARTMENT NAME'
             }
-            if (answers.type == 'Add Department') {
-                createDepartment();
-            }
-            if (answers.type == 'Add Role') {
-                createRole();
-            }
-            if (answers.type == 'Search Employee') {
-                searchEmployee();
-            }
-            if (answers.type == 'Search Role') {
-                searchRole();
-            }
-            if (answers.type == 'Search Department') {
-                searchDepartment()
-            }
-
-            if (answers.type == 'Update Employee') {
-                updateEmployee();
-            }
-            if (answers.type == 'Update Role') {
-                updateRole();
-            }
-            if (answers.type == 'Update Department') {
-                updateDepartment();
-            }
-        })
+        ])
+        .then(answers => {
+            //const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.username);
+            //employees.push(newEngineer);
+            //repeatPrompts();
+            connection.query(
+                "UPDATE department SET ? WHERE ?", [{
+                        department_name: answers.title,
+                    },
+                    {
+                        id: answers.department_id
+                    }
+                ],
+                function(err, res) {
+                    if (err) throw err;
+                    console.log(`Congratulations. Department ${answers.department_id} is now the ${answers.title} department.`)
+                    repeatPrompts();
+                }
+            )
+        });
 };
 
-//DO SOMETHING ELSE PROMPT
-function repeatPrompts() {
-    inquirer
-        .prompt([{
-            type: 'list',
-            name: 'next',
-            message: 'Do something else?',
-            choices: [
-                { name: 'YES' },
-                { name: 'NO' },
-            ]
-        }])
-        .then(answers => {
-            if (answers.next === 'YES') {
-                addData();
-            } else {
-                console.log("Goodbye");
-                connection.end();
-            }
-        });
-}
-
-
-//CREATE SPECIFIC EMPLOYEE TYPE
+//CREATE TYPE
 
 function createDepartment() {
 
