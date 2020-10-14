@@ -22,6 +22,7 @@ const inquirer = require("inquirer");
 const path = require("path");
 const fs = require("fs");
 const util = require("util");
+const { ENETUNREACH } = require("constants");
 
 
 //const OUTPUT_DIR = path.resolve(__dirname, "output");
@@ -44,7 +45,35 @@ function run() {
     addData();
 };
 
+//SEARCH FUNCTIONS
+function searchEmployee() {
+    inquirer
+        .prompt([{
+            type: 'confirm',
+            name: 'search_emp',
+            message: 'Search for employees?'
+        }])
+        .then(answers => {
+            //if (answers.search_emp == "Yes") {
+            connection.query("SELECT * FROM employee",
+                    function(err, res) {
+                        if (err) throw err;
+                        console.log(res);
+                        repeatPrompts();
+                    }
+                ) //}
+        });
+};
+
+function searchDepartment() {};
+
+function searchRole() {};
+
 function addingEmployee() {};
+
+function addingRole() {};
+
+function addingDepartment() {};
 //SESSION GOAL PROMPT
 
 function addData() {
@@ -57,9 +86,9 @@ function addData() {
                 { name: 'Add Employee' },
                 { name: 'Add Department' },
                 { name: 'Add Role' },
-                { name: 'View Employee' },
-                { name: 'View Department' },
-                { name: 'View Role' },
+                { name: 'Search Employee' },
+                { name: 'Search Department' },
+                { name: 'Search Role' },
                 { name: 'Update Employee' },
                 { name: 'Update Department' },
                 { name: 'Update Role' }
@@ -73,6 +102,15 @@ function addData() {
             }
             if (answers.type == 'Add Role') {
                 createRole();
+            }
+            if (answers.type == 'Search Employee') {
+                searchEmployee();
+            }
+            if (answers.type == 'Search Role') {
+                searchRole();
+            }
+            if (answers.type == 'Search Department') {
+                searchDepartment();
             }
         })
 };
