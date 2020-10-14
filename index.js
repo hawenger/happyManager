@@ -47,33 +47,123 @@ function run() {
 
 //SEARCH FUNCTIONS
 function searchEmployee() {
+    //inquirer
+    //    .prompt([{
+    //        type: 'confirm',
+    //        name: 'search_emp',
+    //        message: 'Search for employees?'
+    //    }])
+    //    .then(answers => {
+    //if (answers.search_emp == "Yes") {
+    connection.query("SELECT * FROM employee",
+            function(err, res) {
+                if (err) throw err;
+                console.log(res);
+                repeatPrompts();
+            }
+        )
+        //    });
+};
+
+function searchDepartment() {
+    //inquirer
+    //    .prompt([{
+    //        type: 'confirm',
+    //        name: 'search_dep',
+    //        message: 'Search for department?'
+    //    }])
+    //    .then(answers => {
+    //if (answers.search_emp == "Yes") {
+    connection.query("SELECT * FROM department",
+            function(err, res) {
+                if (err) throw err;
+                console.log(res);
+                repeatPrompts();
+            }
+        )
+        //   });
+};
+
+function searchRole() {
+    //inquirer
+    //    .prompt([{
+    //        type: 'confirm',
+    //        name: 'search_role',
+    //        message: 'Search for role?'
+    //    }])
+    //    .then(answers => {
+    //if (answers.search_emp == "Yes") {
+    connection.query("SELECT * FROM employee_role",
+            function(err, res) {
+                if (err) throw err;
+                console.log(res);
+                repeatPrompts();
+            }
+        )
+        //});
+};
+
+function updateEmployee() {};
+
+function updateRole() {
+    connection.query("SELECT * FROM employee_role",
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            console.log("PRESS Y TO CONTINUE")
+        }
+    )
     inquirer
         .prompt([{
-            type: 'confirm',
-            name: 'search_emp',
-            message: 'Search for employees?'
-        }])
+                type: 'confirm',
+                name: 'confirm_process',
+                message: 'I NEED SOME INFORAMTION FROM YOU'
+            },
+            {
+                type: 'input',
+                name: 'role_id',
+                message: 'ROLE ID OF ROLE TO UPDATE'
+            },
+            {
+                type: 'input',
+                name: 'title',
+                message: 'ENTER TITLE'
+            },
+            {
+                type: 'input',
+                name: 'salary',
+                message: 'ENTER SALARY'
+            },
+            {
+                type: 'input',
+                name: 'department',
+                message: 'ENTER DEPARTMENT'
+            }
+        ])
         .then(answers => {
-            //if (answers.search_emp == "Yes") {
-            connection.query("SELECT * FROM employee",
-                    function(err, res) {
-                        if (err) throw err;
-                        console.log(res);
-                        repeatPrompts();
+            //const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.username);
+            //employees.push(newEngineer);
+            //repeatPrompts();
+            connection.query(
+                "UPDATE employee_role SET ? WHERE ?", [{
+                        title: answers.title,
+                        salary: answers.salary //,
+                            //department: answers.department
+                    },
+                    {
+                        id: answers.role_id
                     }
-                ) //}
+                ],
+                function(err, res) {
+                    if (err) throw err;
+                    console.log("Department Inserted!")
+                    repeatPrompts();
+                }
+            )
         });
 };
 
-function searchDepartment() {};
-
-function searchRole() {};
-
-function addingEmployee() {};
-
-function addingRole() {};
-
-function addingDepartment() {};
+function updateDepartment() {};
 //SESSION GOAL PROMPT
 
 function addData() {
@@ -110,7 +200,17 @@ function addData() {
                 searchRole();
             }
             if (answers.type == 'Search Department') {
-                searchDepartment();
+                searchDepartment()
+            }
+
+            if (answers.type == 'Update Employee') {
+                updateEmployee();
+            }
+            if (answers.type == 'Update Role') {
+                updateRole();
+            }
+            if (answers.type == 'Update Department') {
+                updateDepartment();
             }
         })
 };
