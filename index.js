@@ -9,9 +9,106 @@ const connection = mysql.createConnection({
     database: "happyManagerDB"
 });
 
+//let nameTags = [];
+//let roleNameArray = [];
+//let roleObjectArray = [];
+let departmentObjectsArray = [];
+let departmentNameArray = ['NOT LISTED'];
+let employeeRoleName;
+let departmentName;
+let departmentNameTwo;
+let idNumber;
+let departmentObject;
+
+class DepartmentObj {
+    constructor(dep_name, dep_id) {
+        this.dep_name = dep_name,
+            this.dep_id = dep_id
+    }
+    getDepName() {
+        return this.dep_name
+    }
+
+    getDepId() {
+        return this.dep_id
+    }
+
+    getDepartmentObj() {
+        return "DepartmentObj"
+    }
+}
+
+function allChoices() {
+    connection.query("SELECT * FROM department",
+        function(err, res) {
+            if (err) throw err;
+            for (var i = 0; i < res.length; i++) {
+                const newDep = new DepartmentObj(res[i].department_name, res[i].id);
+                departmentObjectsArray.push(newDep);
+                departmentNameArray.push(res[i].department_name);
+                //resolve(departmentObjectsArray);
+            }
+        })
+}
+//function searchDepartmentName() {
+//    connection.query("SELECT * FROM department",
+//        function(err, res) {
+//            if (err) throw err;
+//            for (var i = 0; i < res.length; i++) {
+//                const newDep = new DepartmentObj(res[i].department_name, res[i].id);
+//
+//                //nameTags.push(newDep);
+//                //console.log(nameTags);
+//                console.log(newDep.dep_name);
+//                console.log(roleName);
+//                if (newDep.dep_name == roleName) { break; } {
+//
+//                    console.log('ISSAMATCH')
+//                } { break; }
+//                //console.log(roleObject);
+//            }
+//            //for (var i = 0; i < nameTags.length || nameTags[i].department_name == roleName; i++) {
+//            //    console.log(nameTags[i].department_name);
+//            //}
+//            //if (newDep.res[i] == roleName[0]) {
+//            //    connection.query(
+//            //        "INSERT INTO employee_role SET ?", {
+//            //            salary: roleObject[0].salary,
+//            //            title: roleObject[0].title,
+//            //            department_id: newDep.dep_id
+//            //        },
+//            //        function(err, res) {
+//            //            if (err) throw err;
+//            //            console.log("Role Inserted!")
+//            //        },
+//            //    )
+//            //} else {
+//            //    console.log("no match found");
+//            //}
+//
+//
+//        }
+//    )
+//} //}
+////)
+////};
+//
+//
+//function compareDepartmentNames() {
+//    let comparedName = "Valerie";
+//    nameTags.forEach(element => {
+//        let depName = element[0].DepartmentObj;
+//        console.log(depName);
+//        //if (depName == comparedName){
+//        //console.log("wonderwoman");
+//        //}
+//    });
+//}
+
 //FUNCTION TO BEGIN APPLICATION
 
 function run() {
+    allChoices();
     addData();
 };
 
@@ -434,6 +531,19 @@ function createDepartment() {
         });
 };
 
+//function verifyEmployee() {
+//    connection.query("SELECT * FROM employee_role", {
+//        function() {
+//            if (title === answers.employee_role) {
+//                console.log("HELLO");
+//            }
+//            if (title != answers.employee_role) {
+//                console.log("no go")
+//            }
+//        }
+//    });
+//}
+
 function createEmployee() {
     inquirer
         .prompt([{
@@ -446,11 +556,17 @@ function createEmployee() {
                 name: 'last_name',
                 message: 'EMPLOYEE LAST NAME'
             },
+            {
+                type: 'input',
+                name: 'employee_role',
+                message: 'EMPLOYEE ROLE'
+            }
 
         ])
         .then(answers => {
             //console.log(answers.first_name);
             //console.log(answers.last_name);
+            //verifyEmployee();
             connection.query(
                 "INSERT INTO employee SET ?", {
                     first_name: answers.first_name,
@@ -468,6 +584,71 @@ function createEmployee() {
 
 };
 
+//function searchArray() {
+//    departmentObjectsArray.forEach(element => {
+
+
+//   });
+//}
+
+function empRoleUpdate() {
+    connection.query(
+        "UPDATE employee_role SET ? WHERE ?", [{
+
+                department_id: idNumber
+            },
+            {
+                title: employeeRoleName
+            }
+        ],
+        function(err, res) {
+            if (err) throw err;
+            console.log(`Employee Role ${employeeRoleName} Assigned Department ID of ${idNumber}`)
+            repeatPrompts();
+        }
+    )
+}
+
+function depNameSearch() {
+    connection.query("SELECT * FROM department WHERE ?", [{
+            department_name: departmentNameTwo
+        }],
+        function(err, res) {
+            if (err) throw err;
+            console.log(res);
+            idNumber = res[0].id;
+            console.log(idNumber);
+            empRoleUpdate();
+            //console.log(res);
+            //repeatPrompts();
+        }
+    )
+}
+
+
+function addUnlistedDepartment() {
+    inquirer
+        .prompt([{
+            type: 'input',
+            name: 'deponame',
+            message: 'ENTER DEPARTMENT NAME'
+        }])
+        .then(answers => {
+            departmentNameTwo = answers.deponame;
+            connection.query(
+                "INSERT INTO department SET ?", {
+                    department_name: answers.deponame,
+                },
+                function(err, res) {
+                    if (err) throw err;
+                    console.log("Department Added!")
+                    depNameSearch();
+                }
+            )
+
+        })
+}
+
 function createRole() {
     //QUERY OF DEPARTMENT
     // IF ANSWERS.XFILE == 
@@ -483,25 +664,50 @@ function createRole() {
                 message: 'ROLE SALARY'
             },
             {
-                type: 'input',
-                name: 'xfile',
-                message: 'WHICH DEPARTMENT OWNS THIS ROLE'
-            }
+                type: 'list',
+                name: 'departmentName',
+                message: 'WHICH DEPARMENT OWNS THIS ROLE?',
+                choices: departmentNameArray
+            },
         ])
         .then(answers => {
-            connection.query(
-                "INSERT INTO employee_role SET ?", {
-                    salary: answers.salary,
-                    title: answers.title
-                },
-                function(err, res) {
-                    if (err) throw err;
-                    console.log("Role Inserted!")
-                    repeatPrompts();
-                }
-            )
+
+            employeeRoleName = answers.title;
+            departmentName = answers.departmentName;
+            console.log(employeeRoleName);
+            console.log(departmentName);
+
+            if (answers.departmentName == 'NOT LISTED') {
+                console.log('YOU GOT NOT LISTED');
+
+                connection.query("INSERT INTO employee_role SET ?", {
+                        salary: answers.salary,
+                        title: answers.title,
+                    }),
+                    function(err, res) {
+                        if (err) throw err;
+                        //console.log("Role Inserted!")
+
+                    }
+                    //.catch(() => {
+                addUnlistedDepartment();
+                //})
+
+            } //else //{
+            if (answers.departmentName != 'NOT LISTED') {
+                console.log('WAFFLES')
+                connection.query("INSERT INTO employee_role SET ?", {
+                        salary: answers.salary,
+                        title: answers.title,
+                    },
+                    function(err, res) {
+                        if (err) throw err;
+                        //console.log("Role Inserted!")
+                    }
+                )
+            }
         });
-};
+}
 
 //RUN APP
 
