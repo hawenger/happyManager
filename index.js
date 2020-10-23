@@ -9,7 +9,6 @@ const connection = mysql.createConnection({
     database: "happyManagerDB"
 });
 
-//let departmentObjectsArray = [];
 let departmentNameArray = ['NOT LISTED'];
 let roleNameArray = ['NOT LISTED'];
 let employeeNameArray = [];
@@ -19,7 +18,6 @@ let idNumber;
 let roleIdNumber;
 let empLastName;
 let nameOEmp;
-//let triggerEmpUpdate = false;
 
 function clearAll() {
     employeeRoleName = "";
@@ -27,7 +25,6 @@ function clearAll() {
     idNumber = "";
     roleIdNumber = "";
     empLastName = "";
-    //triggerEmpUpdate = false;
 }
 
 function allChoices() {
@@ -518,18 +515,6 @@ function createDepartment() {
         });
 };
 
-//function verifyEmployee() {
-//    connection.query("SELECT * FROM employee_role", {
-//        function() {
-//            if (title === answers.employee_role) {
-//                console.log("HELLO");
-//            }
-//            if (title != answers.employee_role) {
-//                console.log("no go")
-//            }
-//        }
-//    });
-//}
 function addUnlistedRole() {
     inquirer
         .prompt([{
