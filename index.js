@@ -12,31 +12,22 @@ const connection = mysql.createConnection({
 //let departmentObjectsArray = [];
 let departmentNameArray = ['NOT LISTED'];
 let roleNameArray = ['NOT LISTED'];
+let employeeNameArray = [];
 let employeeRoleName;
-let departmentName;
 let departmentNameTwo;
 let idNumber;
 let roleIdNumber;
 let empLastName;
-let empFirstName;
-let employeeArray = [];
+let nameOEmp;
+let triggerEmpUpdate = false;
 
-class DepartmentObj {
-    constructor(dep_name, dep_id) {
-        this.dep_name = dep_name,
-            this.dep_id = dep_id
-    }
-    getDepName() {
-        return this.dep_name
-    }
-
-    getDepId() {
-        return this.dep_id
-    }
-
-    getDepartmentObj() {
-        return "DepartmentObj"
-    }
+function clearAll() {
+    employeeRoleName = "";
+    departmentNameTwo = "";
+    idNumber = "";
+    roleIdNumber = "";
+    empLastName = "";
+    triggerEmpUpdate = false;
 }
 
 function allChoices() {
@@ -44,77 +35,30 @@ function allChoices() {
         function(err, res) {
             if (err) throw err;
             for (var i = 0; i < res.length; i++) {
-                const newDep = new DepartmentObj(res[i].department_name, res[i].id);
-                //departmentObjectsArray.push(newDep);
+
                 departmentNameArray.push(res[i].department_name);
-                //resolve(departmentObjectsArray);
+
             }
         })
     connection.query("SELECT * FROM employee_role",
         function(err, res) {
             if (err) throw err;
             for (var i = 0; i < res.length; i++) {
-                //const newEmp = new EmployeeObj(res[i].title, res[i].department_id);
-                //departmentObjectsArray.push(newDep);
+
                 roleNameArray.push(res[i].title);
-                //resolve(departmentObjectsArray);
+
+            }
+        })
+    connection.query("SELECT * FROM employee",
+        function(err, res) {
+            if (err) throw err;
+            for (var i = 0; i < res.length; i++) {
+
+                employeeNameArray.push(`${res[i].last_name}, ${res[i].first_name} ${res[i].id}`);
+
             }
         })
 }
-//function searchDepartmentName() {
-//    connection.query("SELECT * FROM department",
-//        function(err, res) {
-//            if (err) throw err;
-//            for (var i = 0; i < res.length; i++) {
-//                const newDep = new DepartmentObj(res[i].department_name, res[i].id);
-//
-//                //nameTags.push(newDep);
-//                //console.log(nameTags);
-//                console.log(newDep.dep_name);
-//                console.log(roleName);
-//                if (newDep.dep_name == roleName) { break; } {
-//
-//                    console.log('ISSAMATCH')
-//                } { break; }
-//                //console.log(roleObject);
-//            }
-//            //for (var i = 0; i < nameTags.length || nameTags[i].department_name == roleName; i++) {
-//            //    console.log(nameTags[i].department_name);
-//            //}
-//            //if (newDep.res[i] == roleName[0]) {
-//            //    connection.query(
-//            //        "INSERT INTO employee_role SET ?", {
-//            //            salary: roleObject[0].salary,
-//            //            title: roleObject[0].title,
-//            //            department_id: newDep.dep_id
-//            //        },
-//            //        function(err, res) {
-//            //            if (err) throw err;
-//            //            console.log("Role Inserted!")
-//            //        },
-//            //    )
-//            //} else {
-//            //    console.log("no match found");
-//            //}
-//
-//
-//        }
-//    )
-//} //}
-////)
-////};
-//
-//
-//function compareDepartmentNames() {
-//    let comparedName = "Valerie";
-//    nameTags.forEach(element => {
-//        let depName = element[0].DepartmentObj;
-//        console.log(depName);
-//        //if (depName == comparedName){
-//        //console.log("wonderwoman");
-//        //}
-//    });
-//}
 
 //FUNCTION TO BEGIN APPLICATION
 
@@ -140,9 +84,11 @@ function addData() {
             ]
         }]).then(answers => {
             if (answers.type == 'ADD NEW') {
+                clearAll();
                 addNew();
             }
             if (answers.type == 'UPDATE') {
+                clearAll();
                 update();
             }
             if (answers.type == 'SEARCH') {
@@ -354,23 +300,24 @@ function searchDepartment() {
 //UPDATE TYPE
 
 function updateEmployee() {
-    connection.query("SELECT * FROM employee",
-        function(err, res) {
-            if (err) throw err;
-            console.log(res);
-            console.log("PRESS Y TO CONTINUE")
-        }
-    )
+    //connection.query("SELECT * FROM employee",
+    //    function(err, res) {
+    //        if (err) throw err;
+    //        console.log(res);
+    //        console.log("PRESS Y TO CONTINUE")
+    //    }
+    //)
     inquirer
         .prompt([{
-                type: 'confirm',
-                name: 'confirm_process',
-                message: 'I NEED SOME INFORAMTION FROM YOU'
+                type: 'list',
+                name: 'employeeName',
+                message: ' Select Employee to Update',
+                choices: employeeNameArray
             },
             {
-                type: 'input',
-                name: 'emp_id',
-                message: 'EMPLOYEE ID OF EMPLOYEE TO UPDATE'
+                type: 'confirm',
+                name: 'continue',
+                message: 'Time to update your employee!',
             },
             {
                 type: 'input',
@@ -383,33 +330,79 @@ function updateEmployee() {
                 message: 'ENTER EMPLOYEE LAST NAME'
             },
             {
-                type: 'input',
+                type: 'list',
                 name: 'role',
-                message: 'ENTER EMPLOYEE ROLE'
+                message: 'SELECT EMPLOYEE ROLE',
+                choices: roleNameArray
             }
         ])
         .then(answers => {
-            //const newEngineer = new Engineer(answers.name, answers.id, answers.email, answers.username);
-            //employees.push(newEngineer);
-            //repeatPrompts();
-            connection.query(
-                "UPDATE employee SET ? WHERE ?", [{
-                        first_name: answers.first_name,
-                        last_name: answers.last_name //,
-                            //department: answers.department
-                    },
-                    {
-                        id: answers.emp_id
+            nameOEmp = answers.employeeName;
+            employeeRoleName = answers.role;
+            triggerEmpUpdate = true;
+            if (answers.role == 'NOT LISTED') {
+                connection.query(
+                    "UPDATE employee SET ? WHERE ?", [{
+                            last_name: answers.last_name,
+                            first_name: answers.first_name //,
+                                //department: answers.department
+                        },
+                        {
+                            id: nameOEmp.slice(-1)
+                        }
+                    ],
+                    function(err, res) {
+                        if (err) throw err;
+                        //console.log(`Role ${answers.role_id} has been updated. Good job.`)
+                        //repeatPrompts();
+                        addUnlistedRole();
                     }
-                ],
-                function(err, res) {
-                    if (err) throw err;
-                    console.log(`Employee ${answers.emp_id}, ${answers.first_name} ${answers.last_name} has been updated. Good job.`)
-                    repeatPrompts();
-                }
-            )
+                )
+
+            }
+            if (answers.role != 'NOT LISTED') {
+                empLastName = answers.last_name;
+                connection.query(
+                        "UPDATE employee SET ? WHERE ?", [{
+                                last_name: answers.last_name,
+                                first_name: answers.first_name //,
+                                    //department: answers.department
+                            },
+                            {
+                                id: nameOEmp.slice(-1)
+                            }
+                        ],
+                        function(err, res) {
+                            if (err) throw err;
+                            //console.log(`Role ${answers.role_id} has been updated. Good job.`)
+                            //repeatPrompts();
+                            empFindRole();
+                        }
+                    )
+                    //
+                    //    function(err, res) {
+                    //        if (err) throw err;
+                    //        console.log(`Employee ${answers.emp_id}, ${answers.first_name} ${answers.last_name} has been updated. Good job.`)
+                    //        repeatPrompts();
+                    //    }
+                    //)
+            }
         });
 };
+
+function empFindRole() {
+    connection.query(
+        "SELECT * FROM employee_role WHERE ?", [{
+            title: employeeRoleName
+        }],
+        function(err, res) {
+            if (err) throw err;
+            roleIdNumber = res[0].id;
+            idNumber = res[0].department_id;
+            employeeUpdateTwo();
+        }
+    )
+}
 
 function updateRole() {
     connection.query("SELECT * FROM employee_role",
@@ -650,7 +643,7 @@ function createEmployee() {
             }
             if (answers.employee_role != 'NOT LISTED') {
                 //departmentNameTwo = answers.departmentName;
-                connection.query("INSERT INTO employee_role SET ?", {
+                connection.query("INSERT INTO employee SET ?", {
                         first_name: answers.first_name,
                         last_name: answers.last_name,
                     }),
@@ -658,10 +651,23 @@ function createEmployee() {
                         if (err) throw err;
 
                     }
-                depNameSearch();
+                findRole();
 
             }
         });
+}
+
+function findRole() {
+    connection.query("SELECT * FROM employee_role WHERE ?", [{
+            title: employeeRoleName
+        }],
+        function(err, res) {
+            if (err) throw err;
+            roleIdNumber = res[0].id;
+            idNumber = res[0].department_id;
+            employeeUpdateTwo();
+        }
+    )
 }
 
 function employeeUpdateOne() {
@@ -689,7 +695,7 @@ function employeeUpdateTwo() {
         ],
         function(err, res) {
             if (err) throw err;
-            //console.log(`Employee Role ${employeeRoleName} Assigned Department ID of ${idNumber}`)
+            console.log(`Employee  ${empLastName} Assigned Manager ID of ${idNumber} $ Role Id of ${roleIdNumber}`);
             repeatPrompts();
         }
     )
@@ -710,7 +716,7 @@ function empRoleUpdate() {
             ],
             function(err, res) {
                 if (err) throw err;
-                //console.log(`Employee Role ${employeeRoleName} Assigned Department ID of ${idNumber}`)
+                console.log(`Employee Role ${employeeRoleName} Assigned Department ID of ${idNumber}`)
                 repeatPrompts();
             }
         )
@@ -727,7 +733,6 @@ function empRoleUpdate() {
             ],
             function(err, res) {
                 if (err) throw err;
-                //console.log(`Employee Role ${employeeRoleName} Assigned Department ID of ${idNumber}`)
                 employeeUpdateOne();
             }
         )
@@ -825,15 +830,6 @@ function createRole() {
 
 //RUN APP
 
-//function askQuestion() {
-//connection.query("SELECT * FROM department", function(err, res) {
-//    if (err) throw err;
-//    for (var i = 0; i < res.length; i++) {
-//        console.log(res[i].id + " | " + res[i].department_name);
-//    }
-//    console.log("-----------------------------------");
-//});
-//}
 connection.connect(function(err) {
     if (err) throw err;
     console.log("connected as id " + connection.threadId);
