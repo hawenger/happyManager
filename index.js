@@ -241,10 +241,15 @@ function searchRole() {
 
         function(err, res) {
             if (err) throw err;
-            console.log('Your Results')
+            console.table(res.employee_role) //('Your Results')
             for (var i = 0; i < res.length; i++) {
 
-                console.log(`ID: ${res[i].id} || ${res[i].title} || ${res[i].salary} || DEPARTMENT ID:${res[i].department_id}`);
+                console.table([{
+                    ID: `${res[i].id}`,
+                    TITLE: `${res[i].title}`,
+                    SALARY: `${res[i].salary}`,
+                    DEPARTMENT_ID: `${res[i].department_id}`
+                }]);
 
             };
             repeatPrompts();
